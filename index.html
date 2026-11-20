@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>출애굽의 여정 · THE EXODUS JOURNEY</title>
+  <meta name="description" content="성경 본문과 실제 3D DEM 지형, 고고학 발굴·금석문, 사회학·문화기억 연구를 함께 탐험하는 출애굽 여정 지도" />
+  <meta name="theme-color" content="#101d1b" />
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css?v=4" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js",
+        "three/addons/": "./vendor/addons/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="shell" id="shell" style="--j: #e5b96f">
+    <header class="top">
+      <a class="brand" href="#all" id="brandLink">
+        <img src="./icons/favicon.svg" alt="" class="brandIcon" width="32" height="32" />
+        <span class="brandText">
+          <strong>출애굽의 여정</strong>
+          <small>THE EXODUS JOURNEY</small>
+        </span>
+      </a>
+
+      <nav class="tabs" id="tabs" aria-label="여정 단계 선택"></nav>
+
+      <div class="topUtils">
+        <button type="button" class="uBtn accent" id="researchBtn">🏛 발굴·논문</button>
+        <button type="button" class="uBtn" id="pwaBtn">앱으로 받기</button>
+        <button type="button" class="uBtn" id="sourceBtn">자료</button>
+        <button type="button" class="uBtn" id="helpBtn">도움말</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="map" id="mapStage" aria-label="출애굽 3D 지형 지도">
+        <div id="labels" class="labels"></div>
+
+        <div class="mapHead">
+          <div class="eyebrow" id="mapEyebrow">EXODUS 1 – JOSHUA 8</div>
+          <h1 id="mapTitle">출애굽의 여정</h1>
+          <div class="mapMeta" id="mapMeta">출애굽기–여호수아 8장 · 실제 3D 지형 위의 고고학·사회학 탐구</div>
+          <div class="legend" id="legend">
+            <div class="legRow"><span class="legLine solid"></span><span>성경 여정 경로</span></div>
+            <div class="legRow"><span class="legLine dash"></span><span>바다/요단 도하 · 대안 학설</span></div>
+            <div class="legColors" id="legColors"></div>
+          </div>
+        </div>
+
+        <div class="toolsWrap">
+          <button type="button" class="toolsToggle" id="toolsToggle" aria-expanded="false">⚙ 설정</button>
+          <div class="tools" id="toolsBar">
+            <button type="button" class="tBtn" id="fitBtn" title="현재 여정 전체 보기">전체</button>
+            <button type="button" class="tBtn" id="viewBtn" title="2D/3D 시점 전환">2D</button>
+            <div class="reliefSeg" role="group" aria-label="지형 기복 높이">
+              <span class="segLabel">지형</span>
+              <button type="button" class="sBtn" data-scale="0.65">낮게</button>
+              <button type="button" class="sBtn active" data-scale="1.35">보통</button>
+              <button type="button" class="sBtn" data-scale="2.35">높게</button>
+            </div>
+            <button type="button" class="tBtn" id="modernBtn" title="현대 지명 함께 표시">현대 지명</button>
+            <button type="button" class="tBtn active" id="regionBtn" title="지역 및 바다 이름 표시">지역 이름</button>
+            <button type="button" class="tBtn active" id="archBtn" title="고고학 발굴 유적 핀 표시">발굴 유적</button>
+            <button type="button" class="tBtn" id="altBtn" title="북부 시나이 및 미디안 대안 경로 비교">대안 경로</button>
+          </div>
+        </div>
+
+        <div class="playerWrap">
+          <div class="player" id="player">
+            <button type="button" class="pIcon" id="prevBtn" title="이전 장소 (←)">⏮</button>
+            <button type="button" class="pMain" id="playBtn" title="여정 따라가기 (Space)">▶ <span>따라가기</span></button>
+            <button type="button" class="pIcon" id="nextBtn" title="다음 장소 (→)">⏭</button>
+            <div class="track" id="track" role="slider" aria-label="여정 진행 위치" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="trackFill" id="trackFill"></div>
+              <div class="ticks" id="ticks"></div>
+            </div>
+            <button type="button" class="pSpd" id="speedBtn" title="재생 속도 전환">1×</button>
+          </div>
+          <div class="mapHint">끌어서 이동 · 오른쪽 끌기·두 손가락으로 회전 · 휠·벌리기로 확대</div>
+        </div>
+      </section>
+
+      <aside class="panel" id="panel" aria-label="여정 및 고고학 해설 패널">
+        <div class="panelInner" id="panelContent"></div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- 발굴·논문 아카이브 모달 -->
+  <dialog class="modal researchModal" id="researchModal">
+    <div class="mHead">
+      <div>
+        <div class="eyebrow">ARCHAEOLOGY, SOCIOLOGY &amp; CULTURAL MEMORY</div>
+        <h2>고고학 발굴 · 사회학 연구 아카이브</h2>
+      </div>
+      <button type="button" class="mClose" data-close="researchModal" aria-label="닫기">✕</button>
+    </div>
+    <div class="mTabs" id="researchTabs">
+      <button type="button" class="mTab active" data-rtab="arch">발굴 유적 (14)</button>
+      <button type="button" class="mTab" data-rtab="soc">사회학·인류학 (6)</button>
+      <button type="button" class="mTab" data-rtab="theories">경로·연대 학설</button>
+      <button type="button" class="mTab" data-rtab="bib">학술 문헌 (16)</button>
+    </div>
+    <div class="mBody" id="researchBody"></div>
+  </dialog>
+
+  <!-- 자료와 기준 모달 -->
+  <dialog class="modal" id="sourceModal">
+    <div class="mHead">
+      <div>
+        <div class="eyebrow">SOURCES &amp; METHODOLOGY</div>
+        <h2>자료와 기준</h2>
+      </div>
+      <button type="button" class="mClose" data-close="sourceModal" aria-label="닫기">✕</button>
+    </div>
+    <div class="mBody prose">
+      <h3>성경 본문</h3>
+      <p>출애굽기 1–40장, 레위기, 민수기 10–33장, 신명기, 여호수아 1–8장을 기준으로 삼았으며, 지명·인명 및 성경 인용은 <strong>개역개정</strong>을 따랐습니다. 각 정차지 하단 링크를 누르면 대한성서공회 개역개정 본문으로 바로 연결됩니다.</p>
+
+      <h3>고지형(Paleogeography) &amp; 경로</h3>
+      <p>나일 동부 델타와 와디 투밀라트, 발라 호수 지대는 제임스 호프마이어·스티븐 모셔·만프레드 비탁 등의 고지형 복원 연구를 반영했습니다. 시내산과 홍해(얌 수프) 도하 위치 등 학계 견해가 갈리는 지점은 신뢰도 배지(<code>확정</code>·<code>유력</code>·<code>전통</code>·<code>분립</code>)와 <strong>대안 경로</strong> 오버레이를 통해 병렬로 비교할 수 있습니다.</p>
+
+      <h3>고고학 · 사회학 학제간 균형</h3>
+      <p>본 사이트는 이집트 신왕국 행정문서(브루클린·아나스타시 파피루스), 금석문(솔렙·메르넵타·데르 알라·메사 석비), 주요 발굴(텔 엘-다바, 텔 엘-레타바, 텔 엘-보르그, 세라빗 엘-카딤, 팀나, 가데스 바네아, 여리고, 에발산)과 함께, 노먼 갓월드·캐롤 마이어스·이스라엘 핑켈슈타인·아브라함 파우스트·얀 아스만·로널드 헨델·리처드 엘리엇 프리드먼 등 사회학·문화기억 연구 성과를 균형 있게 수록했습니다.</p>
+
+      <h3>3D 지형 데이터 &amp; 프로그램</h3>
+      <p>지형 고도와 해저 수심은 공개 DEM 자료(AWS Open Data Terrain Tiles / Mapzen Terrarium — SRTM, GMTED, ETOPO1)를 Web Mercator 투영으로 가공해 제작했습니다. 특히 해수면 아래 -220m ~ -430m인 요단 계곡(여리고)과 사해 분지가 바다로 침수되지 않도록 오픈 해양(지중해·홍해)과 내륙 호수(사해·갈릴리·쓴호수)를 분리 처리했습니다. 3D 렌더링에는 <strong>Three.js r160</strong>(MIT 라이선스)을 사용했습니다.</p>
+    </div>
+  </dialog>
+
+  <!-- 도움말 모달 -->
+  <dialog class="modal" id="helpModal">
+    <div class="mHead">
+      <div>
+        <div class="eyebrow">HOW TO USE</div>
+        <h2>지도 사용 안내</h2>
+      </div>
+      <button type="button" class="mClose" data-close="helpModal" aria-label="닫기">✕</button>
+    </div>
+    <div class="mBody prose">
+      <h3>지도 조작</h3>
+      <ul>
+        <li><strong>이동:</strong> 마우스 왼쪽 끌기 또는 한 손가락 드래그</li>
+        <li><strong>3D 회전/기울기:</strong> 마우스 오른쪽 끌기(또는 Shift+드래그) · 두 손가락 회전</li>
+        <li><strong>확대/축소:</strong> 마우스 휠 또는 두 손가락 벌리기/오므리기</li>
+        <li><strong>단축키:</strong> <code>Space</code> 재생/멈춤 · <code>← / →</code> 이전/다음 장소 · <code>Esc</code> 팝업 닫기</li>
+      </ul>
+      <h3>도구 막대 기능</h3>
+      <ul>
+        <li><strong>전체 / 2D·3D:</strong> 여정 전체 구도로 되돌리거나 수직 내려다보기(2D)로 전환합니다.</li>
+        <li><strong>지형 (낮게·보통·높게):</strong> 시나이 화강암 산맥과 요단 대지구대(-430m)의 3D 기복 과장도를 조절합니다.</li>
+        <li><strong>현대 지명 / 지역 이름:</strong> 성경 지명 아래 오늘날의 고고학 유적·국가 지명을 함께 표시합니다.</li>
+        <li><strong>발굴 유적 (🏛):</strong> 지도 위의 유적 핀을 누르면 발굴 보고서·고고학 도해 SVG가 즉시 열립니다.</li>
+        <li><strong>대안 경로:</strong> 북부 시나이/하르 카르콤 경로와 아카바만-미디안(제벨 알-라우즈) 가설 경로를 점선으로 비교합니다.</li>
+      </ul>
+    </div>
+  </dialog>
+
+  <!-- PWA 안내 모달 -->
+  <dialog class="modal" id="pwaModal">
+    <div class="mHead">
+      <div>
+        <div class="eyebrow">INSTALL AS APP</div>
+        <h2>앱으로 받아 오프라인에서 보기</h2>
+      </div>
+      <button type="button" class="mClose" data-close="pwaModal" aria-label="닫기">✕</button>
+    </div>
+    <div class="mBody prose">
+      <p>이 웹 애플리케이션은 PWA(Progressive Web App)로 제작되어 브라우저에서 앱처럼 설치할 수 있습니다.</p>
+      <ul>
+        <li><strong>Chrome / Edge (PC·안드로이드):</strong> 주소창 오른쪽의 <strong>설치(⊕)</strong> 아이콘 또는 브라우저 메뉴 → <em>앱 설치</em>를 누르세요.</li>
+        <li><strong>Safari (iPhone·iPad):</strong> 하단 <strong>공유(□↑)</strong> 버튼 → <em>홈 화면에 추가</em>를 선택하세요.</li>
+      </ul>
+      <div id="pwaInstallRow" style="margin-top:14px;"></div>
+    </div>
+  </dialog>
+
+  <!-- 사진 크게 보기 라이트박스 -->
+  <dialog class="lightbox" id="photoLightbox">
+    <div class="lbFrame">
+      <button type="button" class="lbClose" id="lbCloseBtn" aria-label="사진 닫기">✕</button>
+      <div class="lbImgWrap" id="lbImgWrap">
+        <img id="lbImg" src="" alt="" />
+      </div>
+      <div class="lbMeta">
+        <div class="lbCaption" id="lbCaption"></div>
+        <div class="lbCredit" id="lbCredit"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./app.js?v=4"></script>
+</body>
+</html>

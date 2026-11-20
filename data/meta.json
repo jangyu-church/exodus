@@ -1,0 +1,14 @@
+﻿{
+  "west": 30.2000,
+  "east": 37.2000,
+  "north": 33.4000,
+  "south": 27.6000,
+  "mercYNorth": 0.61907081,
+  "mercYSouth": 0.50150003,
+  "gridW": 512,
+  "gridH": 480,
+  "worldW": 24.00,
+  "worldH": 22.80,
+  "minLandElev": -399.1,
+  "maxLandElev": 2513.6
+}
